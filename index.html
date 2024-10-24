@@ -3,113 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Chat Room with Code</title>
+    <title>WhatsApp Style Chat Room</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 0;
         }
 
         .chat-container {
             width: 400px;
             margin: 50px auto;
-            background-color: #fff;
+            background-color: #ffffff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-header {
+            background-color: #075e54;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            font-size: 20px;
         }
 
         #messages {
-            height: 300px;
-            overflow-y: scroll;
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
+            flex: 1;
+            padding: 15px;
+            background-color: #ece5dd;
+            overflow-y: auto;
+        }
+
+        .message {
             padding: 10px;
+            margin: 5px 0;
+            border-radius: 10px;
+            max-width: 60%;
+        }
+
+        .message.sent {
+            background-color: #dcf8c6;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background-color: #ffffff;
+            margin-right: auto;
         }
 
         form {
             display: flex;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
         }
 
         input {
-            width: 100%;
+            flex: 1;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 20px;
+            border: none;
+            margin-right: 10px;
+            background-color: #f0f0f0;
         }
 
         button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+            padding: 10px 15px;
+            background-color: #25d366;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 50%;
             cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #45a049;
         }
 
         /* For the code generation button */
         .generate-code-container {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
         }
 
         .generate-code-container button {
             background-color: #007BFF;
             color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
         }
 
-        .code-input-container {
-            margin-bottom: 20px;
+        .join-container {
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .join-container button {
+            background-color: #25d366;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+
     <div class="chat-container">
-        <!-- Code Input Section -->
-        <div class="code-input-container">
-            <label for="roomCodeInput">Enter Room Code:</label>
-            <input type="text" id="roomCodeInput" placeholder="Enter room code to join" required>
+        <!-- Header -->
+        <div class="chat-header">
+            Private Chat Room
         </div>
-        
+
+        <!-- Messages -->
         <div id="messages"></div>
+
+        <!-- Message Form -->
         <form id="messageForm">
-            <input type="text" id="messageInput" placeholder="Type your message..." required>
-            <button type="submit">Send</button>
+            <input type="text" id="messageInput" placeholder="Type a message..." required>
+            <button type="submit">&#9658;</button>
         </form>
 
-        <!-- Code Generation Button -->
+        <!-- Code Generation Section -->
         <div class="generate-code-container">
-            <button id="generateCodeBtn">Generate & Copy Code</button>
+            <input type="text" id="roomCodeInput" placeholder="Enter room code" required>
+            <button id="generateCodeBtn">Generate Code</button>
+        </div>
+
+        <!-- Join Button -->
+        <div class="join-container">
+            <button id="joinRoomBtn">Join Chat</button>
         </div>
     </div>
 
-    <!-- Include Socket.io -->
     <script src="/socket.io/socket.io.js"></script>
-
     <script>
         const socket = io(); // Connect to server
-        let privateRoomCode = ''; // To store the room code
 
-        const form = document.getElementById('messageForm');
+        let privateRoomCode = ''; // Store the room code
+        const messageForm = document.getElementById('messageForm');
         const messageInput = document.getElementById('messageInput');
         const messages = document.getElementById('messages');
         const roomCodeInput = document.getElementById('roomCodeInput');
         const generateCodeBtn = document.getElementById('generateCodeBtn');
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
 
-        // Function to generate a random code
+        // Function to generate a random code (A-Z and 1-9)
         function generateRandomCode() {
-            return Math.random().toString(36).substr(2, 8); // Generate 8-character code
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+            return result;
         }
 
         // Handle code generation and copying
         generateCodeBtn.addEventListener('click', () => {
             privateRoomCode = generateRandomCode();
+            roomCodeInput.value = privateRoomCode; // Display the generated code
             navigator.clipboard.writeText(privateRoomCode).then(() => {
                 alert(`Code ${privateRoomCode} copied to clipboard!`);
             }).catch(err => {
@@ -117,20 +177,20 @@
             });
         });
 
-        // Only allow joining the room if the code matches
-        roomCodeInput.addEventListener('change', () => {
-            const enteredCode = roomCodeInput.value;
+        // Handle joining the room
+        joinRoomBtn.addEventListener('click', () => {
+            const enteredCode = roomCodeInput.value.trim();
 
             if (enteredCode === privateRoomCode) {
-                socket.emit('joinRoom', privateRoomCode);
-                alert('You have successfully joined the room!');
+                socket.emit('joinRoom', privateRoomCode); // Join the room
+                alert('You have successfully joined the chat!');
             } else {
                 alert('Incorrect code! You cannot join the room.');
             }
         });
 
         // Sending message to server
-        form.addEventListener('submit', (e) => {
+        messageForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const message = messageInput.value;
             socket.emit('chatMessage', message); // Emit message to server
@@ -140,10 +200,21 @@
         // Receiving message from server
         socket.on('message', (msg) => {
             const div = document.createElement('div');
+            div.classList.add('message', 'received');
             div.textContent = msg;
             messages.appendChild(div); // Add message to chat
             messages.scrollTop = messages.scrollHeight; // Auto scroll
         });
+
+        // Display your own sent message
+        socket.on('myMessage', (msg) => {
+            const div = document.createElement('div');
+            div.classList.add('message', 'sent');
+            div.textContent = msg;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        });
     </script>
+
 </body>
 </html>

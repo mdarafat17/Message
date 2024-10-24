@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Chat Room</title>
+    <title>Private Chat Room with Code</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -94,7 +94,6 @@
 
     <script>
         const socket = io(); // Connect to server
-        const roomId = window.location.pathname.split('/')[1]; // Extract roomId from URL path
         let privateRoomCode = ''; // To store the room code
 
         const form = document.getElementById('messageForm');
@@ -113,6 +112,8 @@
             privateRoomCode = generateRandomCode();
             navigator.clipboard.writeText(privateRoomCode).then(() => {
                 alert(`Code ${privateRoomCode} copied to clipboard!`);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
             });
         });
 
@@ -121,7 +122,7 @@
             const enteredCode = roomCodeInput.value;
 
             if (enteredCode === privateRoomCode) {
-                socket.emit('joinRoom', roomId);
+                socket.emit('joinRoom', privateRoomCode);
                 alert('You have successfully joined the room!');
             } else {
                 alert('Incorrect code! You cannot join the room.');
@@ -132,15 +133,15 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const message = messageInput.value;
-            socket.emit('chatMessage', { message, roomId });
-            messageInput.value = '';
+            socket.emit('chatMessage', message); // Emit message to server
+            messageInput.value = ''; // Clear input field
         });
 
         // Receiving message from server
         socket.on('message', (msg) => {
             const div = document.createElement('div');
             div.textContent = msg;
-            messages.appendChild(div);
+            messages.appendChild(div); // Add message to chat
             messages.scrollTop = messages.scrollHeight; // Auto scroll
         });
     </script>

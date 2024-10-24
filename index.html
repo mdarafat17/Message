@@ -1,166 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live SMS Chat</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #e5ddd5;
-      margin: 0;
-      padding: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live SMS Chat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e5ddd5;
+            margin: 0;
+            padding: 20px;
+        }
 
-    .chat-container {
-      width: 400px;
-      margin: 0 auto;
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-    }
+        .chat-container {
+            width: 400px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
 
-    #messages {
-      height: 200px;
-      overflow-y: scroll;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
+        #messages {
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
 
-    .message {
-      margin: 5px 0;
-    }
+        .message {
+            margin: 5px 0;
+        }
 
-    .message.user {
-      text-align: right;
-      color: blue;
-    }
+        .message.user {
+            text-align: right;
+            color: blue;
+        }
 
-    .message.friend {
-      text-align: left;
-      color: green;
-    }
+        .message.friend {
+            text-align: left;
+            color: green;
+        }
 
-    input[type="text"] {
-      width: calc(100% - 22px);
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
 
-    button {
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
 
-    button:hover {
-      background-color: #0056b3;
-    }
+        button:hover {
+            background-color: #0056b3;
+        }
 
-    .code-container {
-      margin-top: 10px;
-    }
+        .code-container {
+            margin-top: 10px;
+        }
 
-    #generated-code {
-      margin: 10px 0;
-      font-weight: bold;
-      color: #333;
-    }
+        #generated-code {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #333;
+        }
 
-    .code-input {
-      width: calc(100% - 22px);
-    }
-  </style>
+        .code-input {
+            width: calc(100% - 22px);
+        }
+    </style>
 </head>
-
 <body>
-  <div class="chat-container">
-    <h2>Live SMS Chat</h2>
-    <div id="messages"></div>
-    <input type="text" id="message-input" placeholder="Type your message..." disabled />
-    <button id="send-button" disabled>Send</button>
-
-    <div class="code-container">
-      <button id="generate-code">Generate Code</button>
-      <div id="generated-code"></div>
-      <input type="text" id="code-input" class="code-input" placeholder="Paste your friend's code here..." />
-      <button id="join-button">Join</button>
+    <div class="chat-container">
+        <h2>Live SMS Chat</h2>
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Type your message..." disabled />
+        <button id="send-button" disabled>Send</button>
+        
+        <div class="code-container">
+            <button id="generate-code">Generate Code</button>
+            <div id="generated-code"></div>
+            <input type="text" id="code-input" class="code-input" placeholder="Paste your friend's code here..." />
+            <button id="join-button">Join</button>
+        </div>
     </div>
-  </div>
 
-  <script>
-    let currentCode = "";
-    let isConnected = false;
-    let messages = []; // Array to hold messages
+    <script>
+        let currentCode = "";
+        let isConnected = false;
+        let messages = []; // Array to hold messages
 
-    // Generate a random 8-character code
-    function generateCode() {
-      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let result = '';
-      for (let i = 0; i < 8; i++) {
-        result += characters.charAt(Math.floor(Math.random() * characters.length));
-      }
-      return result;
-    }
+        // Generate a random 8-character code
+        function generateCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
 
-    // Event listener for code generation
-    document.getElementById('generate-code').addEventListener('click', function () {
-      currentCode = generateCode();
-      document.getElementById('generated-code').textContent = `Your code: ${currentCode}`;
-      navigator.clipboard.writeText(currentCode);
-      alert('Code copied to clipboard! Share this code with your friend.');
-    });
+        // Event listener for code generation
+        document.getElementById('generate-code').addEventListener('click', function() {
+            currentCode = generateCode();
+            document.getElementById('generated-code').textContent = `Your code: ${currentCode}`;
+            navigator.clipboard.writeText(currentCode);
+            alert('Code copied to clipboard! Share this code with your friend.');
+        });
 
-    // Event listener for sending messages
-    document.getElementById('send-button').addEventListener('click', function () {
-      const messageInput = document.getElementById('message-input');
-      const message = messageInput.value;
+        // Event listener for sending messages
+        document.getElementById('send-button').addEventListener('click', function() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
 
-      if (message && isConnected) {
-        messages.push({ text: message, sender: 'user' });
-        displayMessages();
-        messageInput.value = ''; // Clear input field
-      }
-    });
+            if (message && isConnected) {
+                messages.push({ text: message, sender: 'user' });
+                displayMessages();
+                messageInput.value = ''; // Clear input field
+            }
+        });
 
-    // Event listener for joining chat
-    document.getElementById('join-button').addEventListener('click', function () {
-      const codeInput = document.getElementById('code-input').value;
+        // Event listener for joining chat
+        document.getElementById('join-button').addEventListener('click', function() {
+            const codeInput = document.getElementById('code-input').value;
 
-      if (codeInput === currentCode) {
-        isConnected = true; // Set the connection status to true
-        document.getElementById('message-input').disabled = false; // Enable message input
-        document.getElementById('send-button').disabled = false; // Enable send button
-        alert('Connected! You can now chat.');
-        document.getElementById('code-input').value = ''; // Clear the input field
-      } else {
-        alert('Invalid code. Please check and try again.'); // Optional feedback
-      }
-    });
+            // Check if the input code matches the generated code
+            if (codeInput === currentCode) {
+                isConnected = true; // Set the connection status to true
+                document.getElementById('message-input').disabled = false; // Enable message input
+                document.getElementById('send-button').disabled = false; // Enable send button
+                alert('Connected! You can now chat.');
+                document.getElementById('code-input').value = ''; // Clear the input field
+            } else {
+                alert('Invalid code. Please check and try again.'); // Optional feedback
+            }
+        });
 
-    // Function to display messages in the chat
-    function displayMessages() {
-      const messagesContainer = document.getElementById('messages');
-      messagesContainer.innerHTML = ''; // Clear current messages
+        // Function to display messages in the chat
+        function displayMessages() {
+            const messagesContainer = document.getElementById('messages');
+            messagesContainer.innerHTML = ''; // Clear current messages
 
-      messages.forEach(msg => {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', msg.sender === 'user' ? 'user' : 'friend');
-        messageElement.textContent = msg.text;
-        messagesContainer.appendChild(messageElement);
-      });
+            messages.forEach(msg => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', msg.sender === 'user' ? 'user' : 'friend');
+                messageElement.textContent = msg.text;
+                messagesContainer.appendChild(messageElement);
+            });
 
-      messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to bottom
-    }
-  </script>
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to bottom
+        }
+    </script>
 </body>
-
 </html>

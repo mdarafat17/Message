@@ -6,36 +6,37 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-// Serve static files (HTML, CSS, JS)
+// Serve static files
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// Handle Socket.io connections
+// Handle socket connection
 io.on('connection', (socket) => {
-    console.log('New connection...');
+    console.log('New user connected');
 
     // When a user joins a room
     socket.on('joinRoom', (roomCode) => {
-        socket.join(roomCode); // Join the specific room
+        socket.join(roomCode);
         console.log(`User joined room: ${roomCode}`);
 
-        // Send a welcome message to the new user in the room
-        socket.emit('message', 'Welcome to the Private Chat Room!');
+        // Notify the new user
+        socket.emit('message', 'Welcome to the chat!');
 
-        // Notify others in the room about the new user
-        socket.broadcast.to(roomCode).emit('message', 'A new user has joined the chat.');
+        // Notify others in the room
+        socket.broadcast.to(roomCode).emit('message', 'A new user has joined the chat');
 
         // Listen for chat messages
-        socket.on('chatMessage', (message) => {
-            io.to(roomCode).emit('message', message); // Broadcast message to everyone in the room
+        socket.on('chatMessage', (msg) => {
+            io.to(roomCode).emit('message', msg); // Broadcast to the room
+            socket.emit('myMessage', msg); // Display own message
         });
 
         // Handle user disconnect
         socket.on('disconnect', () => {
-            io.to(roomCode).emit('message', 'A user has left the chat.');
+            io.to(roomCode).emit('message', 'A user has left the chat');
         });
     });
 });

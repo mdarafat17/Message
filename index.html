@@ -95,11 +95,12 @@
     </div>
 
     <script>
-        let currentCode = "";
-        let isConnected = false;
-        let messages = []; // Array to hold messages
+        let currentCode = ""; // The code generated for the chat
+        let isConnected = false; // Connection status
+        let messages = []; // Store messages
+        let chatPartner = null; // Track chat partner's code
 
-        // Generate a random 8-character code
+        // Function to generate a random 8-character code
         function generateCode() {
             const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
@@ -111,9 +112,9 @@
 
         // Event listener for code generation
         document.getElementById('generate-code').addEventListener('click', function() {
-            currentCode = generateCode();
+            currentCode = generateCode(); // Generate code
             document.getElementById('generated-code').textContent = `Your code: ${currentCode}`;
-            navigator.clipboard.writeText(currentCode);
+            navigator.clipboard.writeText(currentCode); // Copy code to clipboard
             alert('Code copied to clipboard! Share this code with your friend.');
         });
 
@@ -123,9 +124,9 @@
             const message = messageInput.value;
 
             if (message && isConnected) {
-                messages.push({ text: message, sender: 'user' });
-                displayMessages();
-                messageInput.value = ''; // Clear input field
+                messages.push({ text: message, sender: 'user' }); // Store user message
+                displayMessages(); // Display messages
+                messageInput.value = ''; // Clear input
             }
         });
 
@@ -133,15 +134,16 @@
         document.getElementById('join-button').addEventListener('click', function() {
             const codeInput = document.getElementById('code-input').value;
 
-            // Check if the input code matches the generated code
+            // If the entered code matches the current code
             if (codeInput === currentCode) {
-                isConnected = true; // Set the connection status to true
-                document.getElementById('message-input').disabled = false; // Enable message input
+                isConnected = true; // Update connection status
+                chatPartner = currentCode; // Set the chat partner's code
+                document.getElementById('message-input').disabled = false; // Enable input
                 document.getElementById('send-button').disabled = false; // Enable send button
                 alert('Connected! You can now chat.');
-                document.getElementById('code-input').value = ''; // Clear the input field
+                document.getElementById('code-input').value = ''; // Clear input
             } else {
-                alert('Invalid code. Please check and try again.'); // Optional feedback
+                alert('Invalid code. Please check and try again.'); // Alert invalid code
             }
         });
 
